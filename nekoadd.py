@@ -1,3 +1,12 @@
+from dotenv import load_dotenv
+import os
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# Acesse a variável de ambiente
+TOKEN = os.getenv("7885984369:AAE_P3HvYvbL-_QQxdwCI6c7UDCFnTBX__E")
+
 import re
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
