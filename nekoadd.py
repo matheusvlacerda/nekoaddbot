@@ -1,12 +1,3 @@
-from dotenv import load_dotenv
-import os
-
-# Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
-
-# Acesse a variável de ambiente
-TOKEN = os.getenv("7885984369:AAE_P3HvYvbL-_QQxdwCI6c7UDCFnTBX__E")
-
 import re
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
@@ -14,7 +5,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 TOKEN = "7885984369:AAE_P3HvYvbL-_QQxdwCI6c7UDCFnTBX__E"
 DESTINO_CHAT_ID = 2006153630
 
-# verificação do formato correto
+# Verificação do formato correto da imagem
 async def verificar_formato_imagem(update: Update, context: CallbackContext):
     mensagem = update.message
     if not mensagem.photo:
@@ -37,17 +28,20 @@ async def verificar_formato_imagem(update: Update, context: CallbackContext):
     else:
         return "formato não suportado"
 
+# Ajuste na regex para permitir caracteres especiais em tags, nomes e coleções
 def verificar_formato(legenda, formato_imagem):
+    caracteres_permitidos = r"A-Za-z0-9À-ÿ\s\.\-_'&!?@#$%*\(\)\[\]\{\}\"\|\°\;\+\="
+    
     if formato_imagem == "3:4":
-        padrao = r"^[A-Za-z0-9À-ÿ\s]+,\s[A-Za-z0-9À-ÿ\s]+,\s[A-Za-z0-9À-ÿ\s]+,\s[A-Za-z0-9À-ÿ\s]+,\s[A-Za-z0-9À-ÿ\s]+$"
+        padrao = fr"^[{caracteres_permitidos}]+,\s[{caracteres_permitidos}]+,\s[{caracteres_permitidos}]+,\s[{caracteres_permitidos}]+,\s[{caracteres_permitidos}]+$"
     elif formato_imagem == "16:9":
-        padrao = r"^Banner,\s[A-Za-z0-9À-ÿ\s]+$"
+        padrao = fr"^Banner,\s[{caracteres_permitidos}]+$"
     else:
         return False
     
     return bool(re.match(padrao, legenda))
 
-# comandos e envio de imagens
+# Comandos e envio de imagens
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("🍥 Este é o Nekorin add, o bot responsável pelas adições do Nekorin! Para fazer seu pedido me envie as imagens seguindo as descrições previstas pelo comando */info*", parse_mode="Markdown")
 
@@ -82,19 +76,19 @@ async def receber_imagem(update: Update, context: CallbackContext):
 
     if not verificar_formato(legenda, formato_imagem):
         if formato_imagem == "3:4":
-            mensagem_erro = "❗️ Ops! Parece que a legenda está no formato incorreto... Verifique o formato da legenda para Integrante em */info*"
+            mensagem_erro = "❗️ Ops! Parece que a legenda está no formato incorreto... \nVerifique o formato da legenda para Integrante em */info*\n\n*Está seguindo o formato e continua dando erro? Contate* @nekosuportebot"
         else:  
-            mensagem_erro = "❗️ Ops! Parece que a legenda está no formato incorreto... Verifique o formato da legenda para Banner em */info*"
+            mensagem_erro = "❗️ Ops! Parece que a legenda está no formato incorreto... \nVerifique o formato da legenda para Banner em */info*\n\n*Está seguindo o formato e continua dando erro? Contate* @nekosuportebot"
 
         await update.message.reply_text(mensagem_erro, parse_mode="Markdown")
         return
 
-    # encaminha para o mod
+    # Encaminha para o mod
     await context.bot.send_photo(chat_id=DESTINO_CHAT_ID, photo=foto.file_id, caption=f"{legenda}")
 
 async def error_handler(update: object, context: CallbackContext):
     print(f"Ocorreu um erro: {context.error}")
-    await update.message.reply_text("❗️ Parece que ocorreu um erro! Tente novamente.")
+    await update.message.reply_text("❗️ Parece que ocorreu um erro! \nVerifique os formatos em /info e tente novamente ou contate @nekosuportebot")
 
 def main():
     app = Application.builder().token(TOKEN).build()
