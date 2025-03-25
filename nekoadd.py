@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 TOKEN = "7885984369:AAE_P3HvYvbL-_QQxdwCI6c7UDCFnTBX__E"
-DESTINO_CHAT_ID = 2006153630
+DESTINO_CHAT_IDS = [2006153630, 6375569069]
 
 # Verificação do formato correto da imagem
 async def verificar_formato_imagem(update: Update, context: CallbackContext):
@@ -84,7 +84,8 @@ async def receber_imagem(update: Update, context: CallbackContext):
         return
 
     # Encaminha para o mod
-    await context.bot.send_photo(chat_id=DESTINO_CHAT_ID, photo=foto.file_id, caption=f"{legenda}")
+    for chat_id in DESTINO_CHAT_IDS:
+        await context.bot.send_photo(chat_id=chat_id, photo=foto.file_id, caption=f"{legenda}")
 
 async def error_handler(update: object, context: CallbackContext):
     print(f"Ocorreu um erro: {context.error}")
